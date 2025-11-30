@@ -43,11 +43,11 @@ system-prompt/
 
 ```bash
 # Apply all patches (restores from backup first, so idempotent)
+# Auto-detects CLI path from shell rc files or uses default location
 node patch-cli.js
 
-# Verify with extraction
-CLI_PATH=~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js \
-  node extract-system-prompt.js /tmp/patched.md
+# Verify with extraction (also auto-detects, or use CLI_PATH env var)
+node extract-system-prompt.js /tmp/patched.md
 
 # Restore original
 ./restore-cli.sh
@@ -106,7 +106,7 @@ CLI_PATH=~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js \
 **Important**: Find text must match EXACTLY, including whitespace and newlines.
 
 ### Escaped Backticks
-In the CLI bundle, backticks are escaped as `\``. Use `\`` in patch files for strings like `\`command\``.
+The CLI bundle escapes backticks as `\`` (backslash + backtick). Copy strings exactly as they appear in the bundle, including escapes like `\`command\``.
 
 ### Iterate and Test
 1. Add ONE patch
@@ -133,7 +133,7 @@ The extraction script:
 
 ## Variable Mappings (v2.0.55)
 
-These change with each minified build:
+These change with each minified build. When updating, search the CLI bundle for readable strings (e.g., `"Bash"`) to find new variable names.
 
 | Minified | Actual |
 |----------|--------|
@@ -147,23 +147,66 @@ These change with each minified build:
 | DD | Glob |
 | uY | Grep |
 | uJ | AskUserQuestion |
-| uzA | 2000 (line limit) |
+| ZC | Explore (agent type) |
+| yb1 | claude-code-guide (agent type) |
+| F, Oq | SlashCommand |
+| Lk | WebSearch |
+| Nk | NotebookEdit |
+| uzA, EA6 | 2000 (line limit) |
 | kj9 | 600000 (10 min timeout) |
 
-## Remaining Slimming Opportunities (~300 chars)
+## Remaining Slimming Opportunities
 
-Low-priority sections that could still be trimmed:
+The system prompt is now essentially as slim as practical. The hooks paragraph (~300 chars) could be trimmed but gains are minimal.
 
-### 1. Hooks paragraph (~300 chars)
-Already concise - minimal gain.
+## Updating for New CLI Versions
 
-The system prompt is now essentially as slim as practical without risking behavior changes.
+When Claude Code updates, patches may break due to changed minified variable names or modified content.
+
+### Steps to Update
+
+1. **Backup the new version**:
+   ```bash
+   ./backup-cli.sh
+   ```
+
+2. **If hash mismatch**, compute the new hash:
+   ```bash
+   shasum -a 256 ~/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js
+   ```
+
+3. **Update `patch-cli.js`**:
+   - Set `EXPECTED_VERSION` to new version (find with `grep "Version:" cli.js`)
+   - Set `EXPECTED_HASH` to the SHA256 from step 2
+
+4. **Run patches and check for failures**:
+   ```bash
+   node patch-cli.js
+   ```
+   Patches showing `[SKIP]` need their find strings updated.
+
+5. **Fix skipped patches**: The minified bundle changes each build, so:
+   - Search the CLI bundle for the readable text (e.g., "# Tone and style")
+   - Copy the surrounding context into the patch `.find.txt` file
+   - The replacement `.replace.txt` usually stays the same
+
+6. **Verify with extraction**:
+   ```bash
+   node extract-system-prompt.js /tmp/patched.md
+   ```
+
+### Updating Variable Mappings
+
+If `extract-system-prompt.js` outputs `[DYNAMIC]` markers, the variable names changed:
+1. Search the bundle for readable strings like `="Bash"` or `="Read"`
+2. Update the `VAR_MAP` object and `replaceVariables()` function
 
 ## What's NOT Captured
 
-Dynamic content injected at runtime:
+Dynamic content injected at runtime (not in static template):
 - Environment info (working directory, platform, date)
 - Git status snapshot
 - Model info ("You are powered by...")
 - CLAUDE.md file contents
 - MCP server instructions
+- Allowed tools list (note: patch #19 removes this from the prompt entirely)
