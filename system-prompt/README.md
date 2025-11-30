@@ -11,7 +11,7 @@ Extract and slim Claude Code's system prompt from the CLI bundle.
 ## File Structure
 
 ```
-experiments/system-prompt-extraction/
+system-prompt/
 ├── backup-cli.sh              # Creates verified backup
 ├── restore-cli.sh             # Restores from backup
 ├── patch-cli.js               # Applies all patches (idempotent)
