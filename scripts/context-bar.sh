@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Claude Code status line script
-# Shows: Opus 4.5 | 📁 Daft | 🔀 main (2 files uncommitted) | ████▄░░░░░ 45% of 155k tokens used (/context)
+# Shows: Opus 4.5 | 📁 Daft | 🔀 main (2 files uncommitted) | ████▄░░░░░ 45% of 200k tokens used (/context)
 #
 # Context calculation:
 # - 200k total context window
 # - 45k reserved for autocompact buffer (disable via /config if needed)
 # - 20k baseline for system prompt, tools, memory, and dynamic context
-# - 155k effectively available, 135k free at conversation start
+# - 155k effectively available (after autocompact buffer), 135k free at conversation start
 
 input=$(cat)
 
@@ -71,8 +71,8 @@ if [[ -n "$transcript_path" && -f "$transcript_path" ]]; then
         else 0 end
     ' < "$transcript_path")
 
-    # 155k available (200k minus 45k autocompact buffer)
-    max_context=155000
+    # 200k total context window
+    max_context=200000
     # 20k baseline: includes system prompt (~3k), tools (~15k), memory (~300),
     # plus ~2k for git status, env block, XML framing, and other dynamic context
     # not shown in /context breakdown but sent to the API
@@ -101,9 +101,9 @@ if [[ -n "$transcript_path" && -f "$transcript_path" ]]; then
         fi
     done
 
-    ctx="${bar} ${pct}% of 155k tokens used (/context)"
+    ctx="${bar} ${pct}% of 200k tokens used (/context)"
 else
-    ctx="█▄░░░░░░░░ 13% of 155k tokens used (/context)"
+    ctx="█░░░░░░░░░ 10% of 200k tokens used (/context)"
 fi
 
 # Build output: Model | Dir | Branch (uncommitted) | Context
