@@ -69,6 +69,13 @@ assistant: Clients are marked as failed in the \\\`connectToServer\\\` function 
 `,
     replace: '# .\n'  // Must be non-whitespace to avoid API error
   },
+  // New patches - Round 2
+  { name: 'Slim TodoWrite When to Use (1.2KB → 200 chars)', file: 'todowrite-when-to-use' },
+  { name: 'Slim Professional objectivity (762 → 120 chars)', file: 'professional-objectivity' },
+  { name: 'Slim WebFetch usage notes (808 → 120 chars)', file: 'webfetch-usage' },
+  { name: 'Slim WebSearch CRITICAL section (485 → 100 chars)', file: 'websearch-critical' },
+  { name: 'Slim Skill tool instructions (887 → 80 chars)', file: 'skill-tool' },
+  { name: 'Slim SlashCommand description (695 → 110 chars)', file: 'slashcommand' },
 ];
 
 // Helper: compute SHA256 hash
