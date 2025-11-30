@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code status line script
-# Shows: Opus 4.5 | 📁 Daft | 🔀 main | ████░░░░░░ 42% of 200k tokens used
+# Shows: Opus 4.5 | 📁 Daft | 🔀 main (2 files uncommitted) | ████░░░░░░ 42% of 200k tokens used
 
 input=$(cat)
 
@@ -10,10 +10,21 @@ model=$(echo "$input" | jq -r '.model.display_name // .model.id // "?"')
 cwd=$(echo "$input" | jq -r '.cwd // empty')
 dir=$(basename "$cwd" 2>/dev/null || echo "?")
 
-# Get git branch
+# Get git branch and uncommitted file count
 branch=""
+uncommitted=""
 if [[ -n "$cwd" && -d "$cwd" ]]; then
     branch=$(git -C "$cwd" branch --show-current 2>/dev/null)
+    if [[ -n "$branch" ]]; then
+        file_count=$(git -C "$cwd" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+        if [[ "$file_count" -eq 0 ]]; then
+            uncommitted="(0 files uncommitted)"
+        elif [[ "$file_count" -eq 1 ]]; then
+            uncommitted="(1 file uncommitted)"
+        else
+            uncommitted="(${file_count} files uncommitted)"
+        fi
+    fi
 fi
 
 # Get transcript path for context calculation
@@ -54,9 +65,9 @@ else
     ctx="░░░░░░░░░░ ?% of 200k tokens used"
 fi
 
-# Build output: Model | Dir | Branch | Context
+# Build output: Model | Dir | Branch (uncommitted) | Context
 output="${model} | 📁${dir}"
-[[ -n "$branch" ]] && output+=" | 🔀${branch}"
+[[ -n "$branch" ]] && output+=" | 🔀${branch} ${uncommitted}"
 output+=" | ${ctx}"
 
 echo "$output"
