@@ -1,5 +1,17 @@
 # 30 Claude Code Tips: From Basics to Advanced
 
+## Tip 0: Customize your status line
+
+You can customize the status line at the bottom of Claude Code to show useful info. I set mine up to show the model, current directory, git branch (if any), and a visual progress bar for token usage:
+
+```
+Opus 4.5 | 📁claude-code-tips | 🔀main | ░░░░░░░░░░ 9% of 200k tokens used
+```
+
+This is especially helpful for keeping an eye on your context usage.
+
+To set this up, you can use [this sample script](scripts/context-bar.sh) and check the [setup instructions](scripts/README.md).
+
 ## Tip 1: Talk to Claude with your voice
 
 I found that you can communicate much faster with your voice than typing with your hands. Using a voice transcription system on your local machine is really helpful for this.

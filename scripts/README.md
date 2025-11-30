@@ -4,7 +4,7 @@
 
 A complete status line script for Claude Code that shows model, directory, git branch, and context usage.
 
-**Example output:** `Opus 4.5 | myproject | main | ████░░░░░░ 42%`
+**Example output:** `Opus 4.5 | 📁myproject | 🔀main | ████░░░░░░ 42% of 200k tokens used`
 
 ### Installation
 
