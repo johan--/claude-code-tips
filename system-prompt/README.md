@@ -16,7 +16,7 @@ system-prompt/
 ├── restore-cli.sh             # Restores from backup
 ├── patch-cli.js               # Applies all patches (idempotent)
 ├── extract-system-prompt.js   # Extracts prompt for verification
-├── patches/                   # 36 patch files (find/replace pairs)
+├── patches/                   # 32 patch files (16 find/replace pairs)
 ├── system-prompt.md           # Original extracted prompt (reference)
 └── README.md
 ```
@@ -118,6 +118,18 @@ These change with each minified build:
 | uJ | AskUserQuestion |
 | uzA | 2000 (line limit) |
 | kj9 | 600000 (10 min timeout) |
+
+## Remaining Slimming Opportunities (~1.5KB)
+
+Sections not yet patched that could be trimmed:
+
+| Section | Approx Size | Notes |
+|---------|-------------|-------|
+| Doing tasks / Over-engineering | ~700 chars | 3 verbose sub-bullets |
+| Tool usage policy examples | ~400 chars | 2 examples |
+| Looking up documentation | ~600 chars | Bullet list |
+| Hooks paragraph | ~300 chars | |
+| Grep tool description | ~500 chars | |
 
 ## What's NOT Captured (~5-10%)
 

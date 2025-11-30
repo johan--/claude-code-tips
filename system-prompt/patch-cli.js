@@ -79,6 +79,8 @@ assistant: Clients are marked as failed in the \\\`connectToServer\\\` function 
   // Round 3 - Final optimizations
   { name: 'Slim EnterPlanMode When to Use (1.2KB → 200 chars)', file: 'enterplanmode-when-to-use' },
   { name: 'Slim Read tool intro (292 → 110 chars)', file: 'read-tool' },
+  // Round 4 - Dynamic content optimization
+  { name: 'Remove allowed tools list from prompt (saves 5-10KB+)', file: 'allowed-tools' },
 ];
 
 // Helper: compute SHA256 hash
