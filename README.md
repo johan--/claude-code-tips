@@ -243,28 +243,31 @@ You can add this layer of Git worktrees on top of the cascade method I discussed
 
 ## Tip 15: Manual exponential backoff for long-running jobs
 
-When waiting on long-running jobs like GitHub CI, you can ask Claude Code to do manual exponential backoff. Exponential backoff is a common technique in software engineering, but you can apply it here too. Ask Claude Code to check the status with increasing sleep intervals - sleep 30, sleep 60, sleep 120. It's not programmatically doing it in the traditional sense - the AI is doing it manually - but it works pretty well.
+When waiting on long-running jobs like GitHub CI, you can ask Claude Code to do manual exponential backoff. Exponential backoff is a common technique in software engineering, but you can apply it here too. Ask Claude Code to check the status with increasing sleep intervals - 30 seconds, then a minute, then two minutes, and so on. It's not programmatically doing it in the traditional sense - the AI is doing it manually - but it works pretty well.
 
 This way the agent can continuously check the status and let you know once it's done.
 
-For example, if you have a PR and you're waiting on the test suite:
+For example, if you have a workflow run you're waiting on:
 
-> Let's keep waiting on this. Do manual exponential backoff until the job passes.
+> Let's do manual exponential backoff - wait 30 seconds, then a minute, two minutes, and so on until it finishes.
 
-Claude Code will then run something like:
+Claude Code will then check with increasing intervals:
 
-```bash
-sleep 30 && gh pr checks 5708 --json name,state
+```
+⏺ Bash(sleep 30 && gh run view 19834011344 --json status,conclusion -q '"\(.status) \(.conclusion)"')
+  ⎿  in_progress
+
+⏺ Running. Waiting 1 minute...
+
+⏺ Bash(sleep 60 && gh run view 19834011344 --json status,conclusion -q '"\(.status) \(.conclusion)"')
+  ⎿  in_progress
+
+⏺ Still running. Waiting 2 minutes...
+
+⏺ Bash(sleep 120 && gh run view 19834011344 --json status,conclusion -q '"\(.status) \(.conclusion)"')
+  ⎿  in_progress
+
+⏺ Still running. Waiting 4 minutes...
 ```
 
-Then if it's still in progress:
-
-```bash
-sleep 60 && gh pr checks 5708 --json name,state
-```
-
-And then:
-
-```bash
-sleep 120 && gh pr checks 5708 --json name,state
-```
+And it keeps going until the job completes.
