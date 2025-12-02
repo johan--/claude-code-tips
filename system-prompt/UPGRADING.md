@@ -96,7 +96,31 @@ grep -l '\${OLD_VAR}' patches/*.txt
 sed -i '' 's/\${E9}/\${C9}/g' patches/*.txt
 ```
 
-### Debugging broken patches
+### Finding where patch text diverges
+
+When a patch shows "not found in bundle", find the exact mismatch point:
+
+```javascript
+// Run: node -e '<paste this>'
+const fs = require('fs');
+const bundle = fs.readFileSync('/opt/homebrew/lib/node_modules/@anthropic-ai/claude-code/cli.js', 'utf8');
+const patch = fs.readFileSync('patches/PATCHNAME.find.txt', 'utf8');
+
+let lo = 100, hi = patch.length;
+while (lo < hi) {
+  const mid = Math.floor((lo + hi + 1) / 2);
+  if (bundle.indexOf(patch.slice(0, mid)) !== -1) lo = mid;
+  else hi = mid - 1;
+}
+console.log('Match up to char:', lo, 'of', patch.length);
+console.log('Patch:', JSON.stringify(patch.slice(lo-20, lo+30)));
+const idx = bundle.indexOf(patch.slice(0, lo));
+console.log('Bundle:', JSON.stringify(bundle.slice(idx + lo - 20, idx + lo + 30)));
+```
+
+This shows exactly where the text differs - usually a changed variable name.
+
+### Debugging runtime crashes
 
 Use bisect mode to find which patch breaks the CLI:
 
@@ -104,8 +128,11 @@ Use bisect mode to find which patch breaks the CLI:
 # Apply only first N patches
 node patch-cli.js --max=10
 
-# Test if claude works
-claude -p "test"
+# Test if claude works (use tmux to avoid interrupting current session)
+tmux new-session -d -s test
+tmux send-keys -t test 'claude -p "test"' Enter
+sleep 5
+tmux capture-pane -t test -p
 
 # Binary search: if works, try more; if crashes, try fewer
 ```
