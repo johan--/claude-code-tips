@@ -12,12 +12,14 @@ A Docker container for running risky, long-running agentic tasks in isolation. I
 ## Quick Start
 
 ```bash
-# Build the image (from repo root)
-docker build -t claude-code-container -f container/Dockerfile .
+# Build the image (from the container directory, or anywhere with the Dockerfile)
+docker build -t claude-code-container -f Dockerfile .
 
-# Run with the repo mounted (so symlinks work)
-docker run -it -v $(pwd):/home/claude/claude-code-tips claude-code-container
+# Run
+docker run -it claude-code-container
 ```
+
+The Dockerfile pulls the latest `claude-code-tips` repo from GitHub during build, so no local files are needed.
 
 ## First-Time Authentication
 
@@ -41,19 +43,18 @@ Follow the prompts to log in with your Google account.
 
 ## What's Included
 
-- **Claude Code 2.0.55** with system prompt patches applied (~39% token savings)
-- **Gemini CLI** for fetching Reddit and other blocked sites
+- **Claude Code 2.0.56** with system prompt patches applied (~39% token savings)
+- **Gemini CLI** pre-configured with `gemini-3-pro-preview` model
 - **tmux** for the reddit-fetch skill
 - **Status bar** showing model, git status, and token usage
-- **Skills** symlinked from the mounted repo
+- **Skills** (reddit-fetch) built into the container
 
 ## Persisting Auth
 
-To avoid re-authenticating every time, you can mount the credential directories:
+To avoid re-authenticating Gemini every time, you can mount the credential directory:
 
 ```bash
 docker run -it \
-  -v $(pwd):/home/claude/claude-code-tips \
   -v ~/.gemini:/home/claude/.gemini \
   claude-code-container
 ```
@@ -66,7 +67,6 @@ Mount your project directory:
 
 ```bash
 docker run -it \
-  -v $(pwd):/home/claude/claude-code-tips \
   -v /path/to/your/project:/home/claude/workspace \
   claude-code-container
 ```
@@ -75,7 +75,9 @@ Then `cd /home/claude/workspace` and start Claude Code there.
 
 ## Updating
 
-If Claude Code or this repo updates:
+To get the latest changes:
 
-1. Rebuild the image: `docker build -t claude-code-container -f container/Dockerfile .`
-2. Run a new container (the setup script will re-apply patches)
+1. Rebuild the image: `docker build --no-cache -t claude-code-container -f Dockerfile .`
+2. Run a new container
+
+The `--no-cache` flag ensures it pulls the latest from GitHub.

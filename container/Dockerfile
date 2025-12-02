@@ -1,11 +1,11 @@
 # Claude Code Container with Gemini CLI fallback
 # For running risky long-running agentic tasks in isolation
 #
-# Build (from repo root):
-#   docker build -t claude-code-container -f container/Dockerfile .
+# Build:
+#   docker build -t claude-code-container -f Dockerfile .
 #
-# Run (mount this repo for symlinks to work):
-#   docker run -it -v $(pwd):/home/claude/claude-code-tips claude-code-container
+# Run:
+#   docker run -it claude-code-container
 #
 # After starting, you need to manually authenticate:
 #   1. Run `claude` and complete Anthropic login
@@ -24,20 +24,29 @@ RUN apt-get update && apt-get install -y \
 # Must be done as root for global npm install
 RUN npm install -g @anthropic-ai/claude-code@2.0.56 @google/gemini-cli
 
-# Copy patching files and apply patches (must be done as root before user switch)
-COPY system-prompt/2.0.56/ /tmp/patches/
+# Clone the claude-code-tips repo
+RUN git clone https://github.com/ykdojo/claude-code-tips.git /tmp/claude-code-tips
+
+# Apply patches using the cloned repo (must be done as root)
 RUN CLI_PATH=/usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js && \
     cp "$CLI_PATH" "$CLI_PATH.backup" && \
-    node /tmp/patches/patch-cli.js "$CLI_PATH" && \
-    rm -rf /tmp/patches
+    node /tmp/claude-code-tips/system-prompt/2.0.56/patch-cli.js "$CLI_PATH"
 
 # Create claude user (don't run as root)
 RUN useradd -m -s /bin/bash claude
+
+# Set up directories and copy files from cloned repo
+RUN mkdir -p /home/claude/.claude/scripts /home/claude/.claude/skills/reddit-fetch /home/claude/.gemini && \
+    cp /tmp/claude-code-tips/skills/reddit-fetch/SKILL.md /home/claude/.claude/skills/reddit-fetch/SKILL.md && \
+    cp /tmp/claude-code-tips/scripts/context-bar.sh /home/claude/.claude/scripts/context-bar.sh && \
+    chmod +x /home/claude/.claude/scripts/context-bar.sh && \
+    cp /tmp/claude-code-tips/container/setup.sh /home/claude/setup.sh && \
+    chmod +x /home/claude/setup.sh && \
+    chown -R claude:claude /home/claude && \
+    rm -rf /tmp/claude-code-tips
+
 USER claude
 WORKDIR /home/claude
-
-# Create necessary directories
-RUN mkdir -p ~/.claude/scripts ~/.claude/skills/reddit-fetch
 
 # Set up aliases for convenience
 RUN echo "alias c='claude'" >> ~/.bashrc && \
@@ -46,12 +55,11 @@ RUN echo "alias c='claude'" >> ~/.bashrc && \
 # Set up status line in settings.json
 RUN echo '{"statusLine":{"type":"command","command":"~/.claude/scripts/context-bar.sh"}}' > ~/.claude/settings.json
 
-# Copy setup script that creates symlinks and applies patches
-COPY --chown=claude:claude container/setup.sh /home/claude/setup.sh
-RUN chmod +x /home/claude/setup.sh
+# Set up Gemini settings with model
+RUN echo '{"security":{"auth":{"selectedType":"oauth-personal"}},"general":{"previewFeatures":true},"model":{"name":"gemini-3-pro-preview"}}' > ~/.gemini/settings.json
 
 # Working directory for projects
 WORKDIR /home/claude/workspace
 
-# Run setup on container start (creates symlinks to mounted volume)
+# Run setup on container start
 CMD ["/home/claude/setup.sh"]
