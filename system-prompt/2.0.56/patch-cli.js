@@ -57,7 +57,8 @@ function findClaudeCli() {
 }
 
 // Allow custom path for testing, otherwise find it dynamically
-const basePath = process.argv[2] || findClaudeCli();
+const customPath = process.argv.find(a => !a.startsWith('--') && !a.includes('node') && !a.includes('patch-cli'));
+const basePath = customPath || findClaudeCli();
 
 if (!basePath) {
   console.error('Error: Could not find Claude Code CLI. Tried:');
@@ -192,7 +193,20 @@ function main() {
   let content = fs.readFileSync(basePath, 'utf8');
   let appliedCount = 0;
 
+  // Support --max=N for bisecting
+  const maxArg = process.argv.find(a => a.startsWith('--max='));
+  const maxPatches = maxArg ? parseInt(maxArg.split('=')[1]) : Infinity;
+  if (maxPatches !== Infinity) {
+    console.log(`Limiting to first ${maxPatches} patches (bisect mode)\n`);
+  }
+
+  let patchIndex = 0;
   for (const patch of patches) {
+    if (patchIndex >= maxPatches) {
+      console.log(`[STOP] Reached max patches limit (${maxPatches})`);
+      break;
+    }
+    patchIndex++;
     let find, replace;
 
     // Load from file if specified, otherwise use inline
