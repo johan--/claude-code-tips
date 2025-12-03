@@ -173,19 +173,58 @@ tmux kill-session -t test-cc
 
 ## Function-based patches
 
-Some patches replace entire functions (like `allowed-tools`). Find the new signature:
+Some patches replace entire functions (like `allowed-tools`). The function name itself can change completely between versions (e.g., `OS3` -> `vk3`).
 
+**Step 1: Find the function by its unique string content:**
 ```bash
-grep -oE 'function [a-zA-Z0-9_]+\(A\)\{if\(!A\)return"";let Q=[a-zA-Z0-9_]+\(A\);if\(Q\.length===0\)return"";' \
+# Find byte offset of the unique string
+grep -b 'You can use the following tools without requiring user approval' \
   "$(which claude | xargs realpath | xargs dirname)/cli.js"
 ```
 
-Then extract the full function:
+**Step 2: Extract context around that offset:**
 ```bash
-node -e '
-const fs = require("fs");
-const bundle = fs.readFileSync("$(which claude | xargs realpath | xargs dirname)/cli.js", "utf8");
-const start = bundle.indexOf("function FUNCNAME(A){if(!A)");
-if (start !== -1) console.log(bundle.slice(start, start + 300));
-'
+# Use dd to get surrounding bytes (adjust skip value from grep output)
+dd if="$(which claude | xargs realpath | xargs dirname)/cli.js" \
+  bs=1 skip=10482600 count=500 2>/dev/null
 ```
+
+This reveals the full function signature including the new function name and helper variables.
+
+**Step 3: Update both find and replace files** with the new function name and all helper variables.
+
+## Quick testing with non-interactive mode
+
+Instead of testing in interactive mode (which can be slow), use `-p` flag:
+
+```bash
+# Quick sanity check
+claude -p "Say hello"
+
+# Test for prompt corruption
+claude -p "In the prompts that you see so far, is there anything inconsistent or strange? Look for [DYNAMIC] or [object Object]"
+
+# Test specific tools
+claude -p "Use the Read tool to read test.txt" --allowedTools "Read"
+```
+
+This is faster and more reliable for automated testing in containers or CI.
+
+## Testing in Docker containers
+
+For safer testing, use a Docker container with Claude Code installed:
+
+```bash
+# Start container with Claude Code
+docker run -it --name claude-test node:20 bash
+npm install -g @anthropic-ai/claude-code
+
+# Copy patches into container
+docker cp system-prompt/2.0.XX claude-test:/root/patches/
+
+# Apply and test
+docker exec claude-test bash -c "cd /root/patches && ./backup-cli.sh && node patch-cli.js"
+docker exec claude-test claude -p "Say hello"
+```
+
+This isolates testing from your main installation. If something breaks, just restart the container.
