@@ -127,7 +127,7 @@ claude
 
 ## Iterative System Prompt Extraction (2.0.57)
 
-**Status**: 🔄 In Progress - 0/5 consecutive verifications
+**Status**: ✅ Complete - 5/5 consecutive verifications
 
 A second extraction method using model self-reporting. See [2.0.57/ITERATIVE-EXTRACTION.md](2.0.57/ITERATIVE-EXTRACTION.md) for full methodology.
 
@@ -137,20 +137,24 @@ A second extraction method using model self-reporting. See [2.0.57/ITERATIVE-EXT
 3. Continue until **5 consecutive instances confirm no changes needed**
 4. Instances can ADD missing content or DELETE inaccurate content
 
-### Current State
+### Final State
 - **Container**: `eager_moser` (Claude Code 2.0.57)
-- **File**: `/tmp/system_prompt.md` → `system-prompt-iterative-extraction.md`
-- **Size**: 1309 lines (~62KB) vs programmatic extraction's 833 lines (~53KB)
-- **Consecutive "no change" count**: 0/5
+- **Total iterations**: 37 (with stricter prompt after iteration 18)
+- **Final file size**: 1226 lines
 
 ### Files Produced
 | File | Lines | Method |
 |------|-------|--------|
 | `system-prompt-original-unpatched.md` | 833 | Programmatic (from CLI source) |
-| `system-prompt-iterative-extraction.md` | 1309 | Model self-report (iterative) |
+| `system-prompt-iterative-extraction.md` | 1226 | Model self-report (iterative) |
 
-### Next Steps
-- [ ] Continue iterative refinement until 5 consecutive "VERIFIED COMPLETE"
+### Observations
+- Initial prompt caused oscillation on AskUserQuestion tool (instances disagreed on whether it exists)
+- Stricter prompt ("only change if CLEARLY incorrect") helped stabilize
+- Final document includes more detail than programmatic extraction (tool usage notes, behavioral context)
+
+### Completed Steps
+- [x] Continue iterative refinement until 5 consecutive "VERIFIED COMPLETE"
 - [ ] Compare final iterative extraction with programmatic extraction
 - [ ] Document any discrepancies found
 
