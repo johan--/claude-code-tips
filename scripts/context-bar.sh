@@ -112,25 +112,3 @@ output="${model} | 📁${dir}"
 output+=" | ${ctx}"
 
 echo "$output"
-
-# Get user's last message (text only, not tool results)
-if [[ -n "$transcript_path" && -f "$transcript_path" ]]; then
-    max_len=$((${#output} - 4))  # subtract for "💬 " prefix
-    last_user_msg=$(jq -rs '
-        [.[] | select(.type == "user") |
-         select(.message.content | type == "string" or
-                (type == "array" and any(.[]; .type == "text")))] |
-        last | .message.content |
-        if type == "string" then .
-        else [.[] | select(.type == "text") | .text] | join(" ") end |
-        gsub("\n"; " ") | gsub("  +"; " ")
-    ' < "$transcript_path" 2>/dev/null)
-
-    if [[ -n "$last_user_msg" ]]; then
-        if [[ ${#last_user_msg} -gt $max_len ]]; then
-            echo "💬 ${last_user_msg:0:$((max_len - 3))}..."
-        else
-            echo "💬 ${last_user_msg}"
-        fi
-    fi
-fi
