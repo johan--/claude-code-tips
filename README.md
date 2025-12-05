@@ -15,7 +15,7 @@ This is especially helpful for keeping an eye on your context usage and remember
 
 To set this up, you can use [this sample script](scripts/context-bar.sh) and check the [setup instructions](scripts/README.md).
 
-## Tip 1: Talk to Claude with your voice
+## Tip 1: Talk to Claude Code with your voice
 
 I found that you can communicate much faster with your voice than typing with your hands. Using a voice transcription system on your local machine is really helpful for this.
 
