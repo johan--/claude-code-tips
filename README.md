@@ -216,8 +216,8 @@ Claude Code's system prompt and tool definitions take up about 18k tokens (~9% o
 | System prompt | 2.9k | 2.0k | 900 tokens |
 | System tools | 14.7k | 8.3k | 6,400 tokens |
 | **Static total** | **~18k** | **~10k** | **~7,300 tokens (41%)** |
-| Allowed tools list | ~2.5-3.5k | 0 | ~3,000 tokens |
-| **Total** | **~21k** | **~10k** | **~11,000 tokens (52%)** |
+| Allowed tools list | ~2.5-3.5k | 0 | ~2.5-3.5k tokens |
+| **Total** | **~21k** | **~10k** | **~10-11k tokens (~50%)** |
 
 The allowed tools list is dynamic context - it grows as you approve more bash commands. With 70+ approved commands, mine was eating up 2,500-3,500 tokens. The patch removes this list entirely.
 
