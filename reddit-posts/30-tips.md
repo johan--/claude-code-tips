@@ -13,7 +13,7 @@ Opus 4.5 | 📁Daft | 🔀fix/colab-pydantic-pickle (0 files uncommitted, synced
 
 This is especially helpful for keeping an eye on your context usage and remembering what you were working on.
 
-To set this up, you can use [this sample script](scripts/context-bar.sh) and check the [setup instructions](scripts/README.md).
+To set this up, you can use [this sample script](https://github.com/ykdojo/claude-code-tips/blob/main/scripts/context-bar.sh) and check the [setup instructions](https://github.com/ykdojo/claude-code-tips/blob/main/scripts/README.md).
 
 ## Tip 1: Talk to Claude Code with your voice
 
@@ -163,7 +163,7 @@ This applies to any AI, not just Claude Code.
 
 Claude Code's WebFetch tool can't access certain sites, like Reddit. But you can work around this by creating a skill that tells Claude to use Gemini CLI as a fallback. Gemini has web access and can fetch content from sites that Claude can't reach directly.
 
-This uses the same tmux pattern from Tip 8 - start a session, send commands, capture output. The skill file goes in `~/.claude/skills/reddit-fetch/SKILL.md`. See [skills/reddit-fetch/SKILL.md](skills/reddit-fetch/SKILL.md) for the full content.
+This uses the same tmux pattern from Tip 8 - start a session, send commands, capture output. The skill file goes in `~/.claude/skills/reddit-fetch/SKILL.md`. See [the full skill file here](https://github.com/ykdojo/claude-code-tips/blob/main/skills/reddit-fetch/SKILL.md).
 
 Skills are more token-efficient because Claude Code only loads them when needed. If you want something simpler, you can put a condensed version in `~/.claude/CLAUDE.md` instead, but that gets loaded into every conversation whether you need it or not.
 
@@ -210,7 +210,7 @@ My personal method is what I would call a "cascade" - whenever I start a new tas
 
 Here's what my setup typically looks like:
 
-![Terminal tabs showing multitasking workflow](multitasking-terminal-tabs.png)
+![Terminal tabs showing multitasking workflow](https://raw.githubusercontent.com/ykdojo/claude-code-tips/main/multitasking-terminal-tabs.png)
 
 In this example:
 1. **Leftmost tab** - A persistent tab running my voice transcription system (always stays here)
@@ -235,15 +235,19 @@ The allowed tools list is dynamic context - it grows as you approve more bash co
 
 Here's what `/context` looks like before and after patching:
 
-| Unpatched (~18k, 9%) | Patched (~10k, 5%) |
-|---------------------|-------------------|
-| ![Unpatched context](system-prompt/2.0.59/context-unpatched.png) | ![Patched context](system-prompt/2.0.59/context-patched.png) |
+**Unpatched (~18k, 9%):**
+
+![Unpatched context](https://raw.githubusercontent.com/ykdojo/claude-code-tips/main/system-prompt/2.0.59/context-unpatched.png)
+
+**Patched (~10k, 5%):**
+
+![Patched context](https://raw.githubusercontent.com/ykdojo/claude-code-tips/main/system-prompt/2.0.59/context-patched.png)
 
 The patches work by trimming verbose examples and redundant text from the minified CLI bundle while keeping all the essential instructions. For example, the TodoWrite examples go from 6KB to 0.4KB, and the Bash tool description drops from 3.7KB to 0.6KB.
 
 I've tested this extensively and it works well. It feels more raw - more powerful, but maybe a little less regulated, which makes sense because the system instruction is shorter. It feels more like a pro tool when you use it this way. I really enjoy starting with lower context because you have more room before it fills up, which gives you the option to continue conversations a bit longer. That's definitely the best part of this strategy.
 
-Check out the [system-prompt folder](system-prompt/) for the patch scripts and full details on what gets trimmed.
+Check out the [system-prompt folder](https://github.com/ykdojo/claude-code-tips/tree/main/system-prompt) for the patch scripts and full details on what gets trimmed.
 
 **Why patching?** Claude Code has flags that let you provide a simplified system prompt from a file (`--system-prompt` or `--system-prompt-file`), so that's another way to go about it. But for the tool descriptions and the dynamic approved tools list, there's no official option to customize them. Patching the CLI bundle is the only way. Since my patch system handles everything in one unified approach, I'm keeping it this way for now. I might re-implement the system prompt portion using the flag in the future.
 
@@ -269,7 +273,7 @@ This way the agent can continuously check the status and let you know once it's 
 
 For example, if you have a Docker build running in the background:
 
-![Manual exponential backoff checking Docker build progress](manual-exponential-backoff.png)
+![Manual exponential backoff checking Docker build progress](https://raw.githubusercontent.com/ykdojo/claude-code-tips/main/manual-exponential-backoff.png)
 
 And it keeps going until the job completes.
 
@@ -281,7 +285,7 @@ Then I go through it line by line, pretty much. I say okay, let's take a look at
 
 So it's this sort of back-and-forth process, maybe with the terminal on the left and your code editor on the right:
 
-![Side-by-side writing workflow with Claude Code](writing-assistant-side-by-side.png)
+![Side-by-side writing workflow with Claude Code](https://raw.githubusercontent.com/ykdojo/claude-code-tips/main/writing-assistant-side-by-side.png)
 
 That tends to work really well.
 
@@ -303,11 +307,11 @@ Regular sessions are more for methodical work where you control the permissions 
 
 This is useful for research or experimentation, things that take a long time and maybe could be risky. A good example is the Reddit research workflow from Tip 10, where the reddit-fetch skill goes back and forth with Gemini CLI through tmux. Running that unsupervised is risky on your main system, but in a container, if something goes wrong, it's contained.
 
-Another example is how I created the [system prompt patching scripts](system-prompt/) in this repo. When a new version of Claude Code comes out, I need to update the patches for the minified CLI bundle. Instead of running Claude Code with `--dangerously-skip-permissions` on my host machine (where it has access to everything), I run it in a container. Claude Code can explore the minified JavaScript, find the variable mappings, and create new patch files without me approving every little thing that way.
+Another example is how I created the [system prompt patching scripts](https://github.com/ykdojo/claude-code-tips/tree/main/system-prompt) in this repo. When a new version of Claude Code comes out, I need to update the patches for the minified CLI bundle. Instead of running Claude Code with `--dangerously-skip-permissions` on my host machine (where it has access to everything), I run it in a container. Claude Code can explore the minified JavaScript, find the variable mappings, and create new patch files without me approving every little thing that way.
 
-In fact, it was able to complete the migration pretty much on its own. It tried applying the patches, found that some didn't work with the new version, iterated to fix them, and even improved the [instruction document](system-prompt/UPGRADING.md) for future instances based on what it learned.
+In fact, it was able to complete the migration pretty much on its own. It tried applying the patches, found that some didn't work with the new version, iterated to fix them, and even improved the [instruction document](https://github.com/ykdojo/claude-code-tips/blob/main/system-prompt/UPGRADING.md) for future instances based on what it learned.
 
-I set up a Docker container with Claude Code, Gemini CLI, tmux, and all the customizations from this repo. Check out the [container folder](container/) for the Dockerfile and setup instructions.
+I set up a Docker container with Claude Code, Gemini CLI, tmux, and all the customizations from this repo. Check out the [container folder](https://github.com/ykdojo/claude-code-tips/tree/main/container) for the Dockerfile and setup instructions.
 
 ### Advanced: Orchestrating a worker Claude Code in a container
 
@@ -334,7 +338,7 @@ I like to think of it like a billion token rule instead of the 10,000 hour rule.
 
 ## Tip 22: Clone conversations to branch off
 
-Sometimes you want to try a different approach from a specific point in a conversation without losing your original thread. The [clone-conversation script](scripts/clone-conversation.sh) lets you duplicate a conversation with new UUIDs so you can branch off.
+Sometimes you want to try a different approach from a specific point in a conversation without losing your original thread. The [clone-conversation script](https://github.com/ykdojo/claude-code-tips/blob/main/scripts/clone-conversation.sh) lets you duplicate a conversation with new UUIDs so you can branch off.
 
 The first message is tagged with `[CLONED]`, which shows up both in the `claude -r` list and inside the conversation.
 
@@ -412,6 +416,4 @@ I think it's kind of interesting because the computer started with a text interf
 
 ---
 
-📺 **Related talk**: [Claude Code Masterclass](https://youtu.be/9UdZhTnMrTA) - lessons and project examples from 31 months of agentic coding
-
-📰 **Newsletter**: [Agentic Coding with Discipline and Skill](https://agenticcoding.substack.com/) - bring the practice of agentic coding to the next level so it's production-ready
+Originally posted in [this repo](https://github.com/ykdojo/claude-code-tips).
