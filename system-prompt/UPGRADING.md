@@ -21,6 +21,16 @@ The fastest way to upgrade is to have Claude Code fix the patches autonomously i
 3. **Easy recovery** - if something breaks, the container can be reset
 4. **Copy when done** - only move verified patches to the host
 
+### For the outer Claude (or human)
+
+If you're Claude Code running on the host and helping with an upgrade, do NOT run each docker command individually with user approval. Instead:
+1. Run Steps 1-3 to set up the container
+2. Kick off the container Claude in Step 4
+3. Monitor with `tmux capture-pane` until it's done
+4. Then copy the results back
+
+The container Claude handles all the iteration autonomously - that's the whole point.
+
 ### Step 1: Update Claude in container
 
 ```bash
