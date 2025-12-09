@@ -505,6 +505,20 @@ This is actually how I built [cc-safe](https://github.com/ykdojo/cc-safe). By wr
 
 If you want to be extra sure, review the tests yourself to make sure they don't do anything stupid like just returning true.
 
+## Tip 34: Be braver in the unknown; iterative problem solving and speed control
+
+Since I started using Claude Code more intensely, I've noticed that I became more and more brave in the unknown.
+
+For example, when I started working at [Daft](https://github.com/Eventual-Inc/Daft), I noticed a problem with our frontend code. I'm not an expert in React, but I decided to dig into it anyway. I just started asking questions about the codebase and about the problem. Eventually I was able to solve it because I knew how to iteratively solve problems with Claude Code.
+
+A similar thing happened recently. I was building a guide for users of Daft and ran into some very specific issues: cloudpickle not working with Google Colab with Pydantic, and a separate issue with Python and a bit of Rust where things weren't printing correctly in JupyterLab even though they worked fine in the terminal. I had never worked with Rust before.
+
+I could have just created an issue and let other engineers handle it. But I thought, let me dig into the codebase. Claude Code came up with an initial solution, but it wasn't that good. So I slowed down. A colleague suggested we just disable that part, but I didn't want any regression. Can we find a better solution?
+
+What followed was a collaborative and iterative process. Claude Code suggested potential root causes and solutions. I experimented with those. Some turned out to be dead ends, so we went in a different direction. Throughout this, I controlled my pace. Sometimes I went faster, like when letting it explore different solution spaces or parts of the codebase. Sometimes I went slower, asking "what does this line mean exactly?" Controlling the level of abstraction, controlling the speed.
+
+Eventually I found a pretty elegant solution. The lesson: even in the world of the unknown, you can do a lot more with Claude Code than you might think.
+
 ---
 
 📺 **Related talk**: [Claude Code Masterclass](https://youtu.be/9UdZhTnMrTA) - lessons and project examples from 31 months of agentic coding
