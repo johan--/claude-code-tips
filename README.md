@@ -203,6 +203,8 @@ In subsequent conversations, you can ask the agent to update the document for th
 
 I've also created a `/handoff` slash command that automates this - it checks for an existing HANDOFF.md, reads it if present, then creates or updates it with the goal, progress, what worked, what didn't, and next steps. You can find it in the [commands folder](commands/handoff.md).
 
+Another approach is to have a `PROGRESS.md` document that Claude Code keeps updating as it goes. It's a little bit like HANDOFF.md, but the difference is it's meant to be a persistent document that keeps getting updated throughout your work.
+
 ## Tip 8: Complete the write-test cycle for autonomous tasks
 
 If you want Claude Code to run something autonomously, like `git bisect`, you need to give it a way to verify results. The key is completing the write-test cycle: write code, run it, check the output, and repeat.
