@@ -89,30 +89,30 @@ total_output=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
 max_context=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
 total_tokens=$((total_input + total_output))
 
+max_k=$((max_context / 1000))
+
 if [[ "$total_tokens" -gt 0 ]]; then
     pct=$((total_tokens * 100 / max_context))
+    [[ $pct -gt 100 ]] && pct=100
+
+    bar=""
+    bar_width=10
+    for ((i=0; i<bar_width; i++)); do
+        bar_start=$((i * 10))
+        progress=$((pct - bar_start))
+        if [[ $progress -ge 8 ]]; then
+            bar+="█"
+        elif [[ $progress -ge 3 ]]; then
+            bar+="▄"
+        else
+            bar+="░"
+        fi
+    done
+
+    ctx="${bar} ${pct}% of ${max_k}k tokens used (/context)"
 else
-    pct=10  # baseline estimate at conversation start
+    ctx="░░░░░░░░░░ ?% of ${max_k}k tokens used (/context)"
 fi
-
-[[ $pct -gt 100 ]] && pct=100
-
-bar=""
-bar_width=10
-for ((i=0; i<bar_width; i++)); do
-    bar_start=$((i * 10))
-    progress=$((pct - bar_start))
-    if [[ $progress -ge 8 ]]; then
-        bar+="█"
-    elif [[ $progress -ge 3 ]]; then
-        bar+="▄"
-    else
-        bar+="░"
-    fi
-done
-
-max_k=$((max_context / 1000))
-ctx="${bar} ${pct}% of ${max_k}k tokens used (/context)"
 
 # Build output: Model | Dir | Branch (uncommitted) | Context
 output="${model} | 📁${dir}"
