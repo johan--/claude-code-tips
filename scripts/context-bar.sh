@@ -80,55 +80,39 @@ if [[ -n "$cwd" && -d "$cwd" ]]; then
     fi
 fi
 
-# Get transcript path for context calculation
+# Get transcript path for last message feature
 transcript_path=$(echo "$input" | jq -r '.transcript_path // empty')
 
-# Calculate context bar
-if [[ -n "$transcript_path" && -f "$transcript_path" ]]; then
-    context_length=$(jq -s '
-        map(select(.message.usage and .isSidechain != true and .isApiErrorMessage != true)) |
-        last |
-        if . then
-            (.message.usage.input_tokens // 0) +
-            (.message.usage.cache_read_input_tokens // 0) +
-            (.message.usage.cache_creation_input_tokens // 0)
-        else 0 end
-    ' < "$transcript_path")
+# Calculate context bar using JSON input fields
+total_input=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
+total_output=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
+max_context=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
+total_tokens=$((total_input + total_output))
 
-    # 200k total context window
-    max_context=200000
-    # 20k baseline: includes system prompt (~3k), tools (~15k), memory (~300),
-    # plus ~2k for git status, env block, XML framing, and other dynamic context
-    # not shown in /context breakdown but sent to the API
-    baseline=20000
-    bar_width=10
-
-    if [[ "$context_length" -gt 0 ]]; then
-        pct=$((context_length * 100 / max_context))
-    else
-        # At conversation start, ~18k baseline is already loaded
-        pct=$((baseline * 100 / max_context))
-    fi
-
-    [[ $pct -gt 100 ]] && pct=100
-
-    bar=""
-    for ((i=0; i<bar_width; i++)); do
-        bar_start=$((i * 10))
-        progress=$((pct - bar_start))
-        if [[ $progress -ge 8 ]]; then
-            bar+="█"
-        elif [[ $progress -ge 3 ]]; then
-            bar+="▄"
-        else
-            bar+="░"
-        fi
-    done
-
-    ctx="${bar} ${pct}% of 200k tokens used (/context)"
+if [[ "$total_tokens" -gt 0 ]]; then
+    pct=$((total_tokens * 100 / max_context))
 else
-    ctx="█░░░░░░░░░ 10% of 200k tokens used (/context)"
+    pct=10  # baseline estimate at conversation start
 fi
+
+[[ $pct -gt 100 ]] && pct=100
+
+bar=""
+bar_width=10
+for ((i=0; i<bar_width; i++)); do
+    bar_start=$((i * 10))
+    progress=$((pct - bar_start))
+    if [[ $progress -ge 8 ]]; then
+        bar+="█"
+    elif [[ $progress -ge 3 ]]; then
+        bar+="▄"
+    else
+        bar+="░"
+    fi
+done
+
+max_k=$((max_context / 1000))
+ctx="${bar} ${pct}% of ${max_k}k tokens used (/context)"
 
 # Build output: Model | Dir | Branch (uncommitted) | Context
 output="${model} | 📁${dir}"
