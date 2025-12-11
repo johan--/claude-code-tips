@@ -42,6 +42,7 @@ Here are my tips for getting the most out of Claude Code, including a custom sta
 - [Tip 34: Be braver in the unknown; iterative problem solving](#tip-34-be-braver-in-the-unknown-iterative-problem-solving)
 - [Tip 35: Ctrl+B to move commands to the background](#tip-35-ctrlb-to-move-commands-to-the-background)
 - [Tip 36: The era of personalized software is here](#tip-36-the-era-of-personalized-software-is-here)
+- [Tip 37: Navigating and editing your input box](#tip-37-navigating-and-editing-your-input-box)
 
 <!-- /TOC -->
 
@@ -579,6 +580,42 @@ As I mentioned earlier in this document, I've created a custom transcription too
 Here's another example: [korotovsky/slack-mcp-server](https://github.com/korotovsky/slack-mcp-server), a popular Slack MCP with almost 1,000 stars, is designed to run as a Docker container. I had trouble using it smoothly inside my own Docker container (Docker-in-Docker complications). Instead of fighting with that setup, I just asked Claude Code to write a CLI using Slack's Node SDK directly. It worked really well.
 
 This is an exciting time. Whatever you want to get done, you can ask Claude Code to do it. If it's small enough, you can build it in an hour or two.
+
+## Tip 37: Navigating and editing your input box
+
+Claude Code's input box is designed to emulate common terminal/readline shortcuts, which makes it feel natural if you're used to working in the terminal. Here are some useful ones:
+
+**Navigation:**
+- `Ctrl+A` - Jump to the beginning of the line
+- `Ctrl+E` - Jump to the end of the line
+- `Option+Left/Right` (Mac) or `Alt+Left/Right` - Jump backward/forward by word
+
+**Editing:**
+- `Ctrl+W` - Delete the previous word
+- `Ctrl+U` - Delete from cursor to beginning of line
+- `Ctrl+K` - Delete from cursor to end of line
+- `Ctrl+G` - Open your prompt in an external editor
+
+**Other:**
+- `Ctrl+C` / `Ctrl+L` - Clear the current input
+
+If you're familiar with bash, zsh, or other shells, you'll feel right at home.
+
+For `Ctrl+G`, the editor is determined by your `EDITOR` environment variable. You can set it in your shell config (`~/.zshrc` or `~/.bashrc`):
+
+```bash
+export EDITOR=vim      # or nano, code, nvim, etc.
+```
+
+Or in `~/.claude/settings.json` (requires restart):
+
+```json
+{
+  "env": {
+    "EDITOR": "vim"
+  }
+}
+```
 
 ---
 
