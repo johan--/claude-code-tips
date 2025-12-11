@@ -41,6 +41,7 @@ Here are my tips for getting the most out of Claude Code, including a custom sta
 - [Tip 33: Write lots of tests (and use TDD)](#tip-33-write-lots-of-tests-and-use-tdd)
 - [Tip 34: Be braver in the unknown; iterative problem solving](#tip-34-be-braver-in-the-unknown-iterative-problem-solving)
 - [Tip 35: Ctrl+B to move commands to the background](#tip-35-ctrlb-to-move-commands-to-the-background)
+- [Tip 36: The era of personalized software is here](#tip-36-the-era-of-personalized-software-is-here)
 
 <!-- /TOC -->
 
@@ -568,6 +569,16 @@ Eventually I found a pretty elegant solution. The lesson: even in the world of t
 When you have a long-running bash command in Claude Code, you can press Ctrl+B to move it to run in the background. Claude Code knows how to manage background processes - it can check on them later using the BashOutput tool.
 
 This is useful when you realize a command is taking longer than expected and you want Claude to do something else in the meantime. You can either have it use the exponential backoff method I mentioned in Tip 16 to check on progress, or just let it work on something else entirely while the process runs.
+
+## Tip 36: The era of personalized software is here
+
+We're entering an era of personalized, custom software. Since AI came out - ChatGPT in general, but especially Claude Code - I've noticed that I'm able to create a lot more software, sometimes just for myself, sometimes for small projects.
+
+As I mentioned earlier in this document, I've created a custom transcription tool that I use every day to talk to Claude Code. I've created ways to customize Claude Code itself. I've also done a bunch of data visualization and data analysis tasks using Python much faster than I could otherwise.
+
+Here's another example: [korotovsky/slack-mcp-server](https://github.com/korotovsky/slack-mcp-server), a popular Slack MCP with almost 1,000 stars, is designed to run as a Docker container. I had trouble using it smoothly inside my own Docker container (Docker-in-Docker complications). Instead of fighting with that setup, I just asked Claude Code to write a CLI using Slack's Node SDK directly. It worked really well.
+
+This is an exciting time. Whatever you want to get done, you can ask Claude Code to do it. If it's small enough, you can build it in an hour or two.
 
 ---
 
