@@ -94,6 +94,7 @@ const patches = [
   { name: 'Remove duplicate emoji instruction in Write tool', file: 'write-emoji' },
   { name: 'Slim TodoWrite examples (6KB → 0.4KB)', file: 'todowrite-examples' },
   { name: 'Slim TodoWrite states section (1.8KB → 0.4KB)', file: 'todowrite-states' },
+  { name: 'Slim Task Management examples (~1.2KB → 130 chars)', file: 'task-management-examples' },
   { name: 'Slim EnterPlanMode examples (670 → 150 chars)', file: 'enterplanmode-examples' },
   // Tool description slimming
   { name: 'Slim Bash tool description (3.7KB → 0.6KB)', file: 'bash-tool' },
