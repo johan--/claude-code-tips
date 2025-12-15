@@ -622,7 +622,7 @@ Or in `~/.claude/settings.json` (requires restart):
 
 **Entering newlines (multi-line input):**
 
-The quickest method works everywhere without any setup: type `\` followed by Enter to create a newline. For keyboard shortcuts, run `/terminal-setup` in Claude Code to configure Shift+Enter. On Mac Terminal.app, I use Option+Enter.
+The quickest method works everywhere without any setup: type `\` followed by Enter to create a newline. For keyboard shortcuts, run `/terminal-setup` in Claude Code. On Mac Terminal.app, I use Option+Enter.
 
 ## Tip 38: Spend some time planning, but also prototype quickly
 
