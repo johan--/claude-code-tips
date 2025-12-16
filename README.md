@@ -44,10 +44,11 @@ Here are my tips for getting the most out of Claude Code, including a custom sta
 - [Tip 36: The era of personalized software is here](#tip-36-the-era-of-personalized-software-is-here)
 - [Tip 37: Navigating and editing your input box](#tip-37-navigating-and-editing-your-input-box)
 - [Tip 38: Spend some time planning, but also prototype quickly](#tip-38-spend-some-time-planning-but-also-prototype-quickly)
-- [Tip 39: Simplify overcomplicated code](#tip-39-simplify-overcomplicated-code)
-- [Tip 40: Automation of automation](#tip-40-automation-of-automation)
-- [Tip 41: Share your knowledge and contribute where you can](#tip-41-share-your-knowledge-and-contribute-where-you-can)
-- [Tip 42: Keep learning!](#tip-42-keep-learning)
+- [Tip 39: Get notified when Claude Code is done](#tip-39-get-notified-when-claude-code-is-done)
+- [Tip 40: Simplify overcomplicated code](#tip-40-simplify-overcomplicated-code)
+- [Tip 41: Automation of automation](#tip-41-automation-of-automation)
+- [Tip 42: Share your knowledge and contribute where you can](#tip-42-share-your-knowledge-and-contribute-where-you-can)
+- [Tip 43: Keep learning!](#tip-43-keep-learning)
 
 <!-- /TOC -->
 
@@ -644,7 +645,48 @@ For example, I was recently experimenting with creating a diff viewer. I first t
 
 You can use plan mode for this by pressing Shift+Tab to switch to it. Or you can just ask Claude Code to make a plan before writing any code.
 
-## Tip 39: Simplify overcomplicated code
+## Tip 39: Get notified when Claude Code is done
+
+When working on longer tasks, you might want to switch to another window while Claude Code works. But then you have to keep checking back to see if it's finished. Hooks can solve this by sending you a notification when Claude Code stops.
+
+I wrote a script ([notify-complete.sh](scripts/notify-complete.sh)) that sends a macOS notification with the project name and your last message. You can also click the notification to jump directly to that Terminal window and tab. Note that this script is designed for Terminal.app on macOS.
+
+Here's how you can set it up. First, install terminal-notifier:
+
+```bash
+brew install terminal-notifier
+```
+
+Then copy or symlink the script to your Claude scripts folder:
+
+```bash
+mkdir -p ~/.claude/scripts
+# Either copy:
+cp scripts/notify-complete.sh ~/.claude/scripts/
+# Or symlink:
+ln -s /path/to/repo/scripts/notify-complete.sh ~/.claude/scripts/
+```
+
+Finally, add a Stop hook to your `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/notify-complete.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## Tip 40: Simplify overcomplicated code
 
 I've found that Claude Code sometimes overcomplicates things and writes too much code. It makes changes you didn't ask for. It just seems to have a bias for writing more code. The code might work correctly if you've followed the other tips in this guide, but it's going to be hard to maintain and hard to check. It can be kind of a nightmare if you don't review it enough.
 
@@ -654,7 +696,7 @@ Some people say if you write code only through AI, you'll never understand it. B
 
 Note that this applies to prose as well. Claude Code often tries to summarize previous paragraphs in the last paragraph, or previous sentences in the last sentence. It can get pretty repetitive. Sometimes it's helpful, but most of the time you'll need to ask it to remove or simplify it.
 
-## Tip 40: Automation of automation
+## Tip 41: Automation of automation
 
 At the end of the day, it's all about automation of automation. What I mean by that is I've found it's the best way to not just become more productive, but also make the process more fun. At least to me, this whole process of automation of automation is really fun.
 
@@ -666,7 +708,7 @@ Then I started to think, I find myself repeating myself sometimes. So I would pu
 
 I think ultimately that's where we're heading. Whenever you find yourself repeating the same task or the same command over and over again, a couple of times is okay, but if you repeat it over and over again, then think about a way to automate that whole process.
 
-## Tip 41: Share your knowledge and contribute where you can
+## Tip 42: Share your knowledge and contribute where you can
 
 This tip is a bit different from the others. I found that by learning as much as you can, you're able to share your knowledge with people around you. Maybe through posts like these, maybe even books, courses, videos. I also recently had an [internal session for my colleagues at Daft](https://www.daft.ai/blog/how-we-use-ai-coding-agents). It's been very rewarding.
 
@@ -681,7 +723,7 @@ When it comes to contributing, I've been sending issues to the Claude Code repo.
 
 It's kind of amazing how fast the team can react to feature requests and bug reports. But it makes sense because they're using Claude Code to build Claude Code itself.
 
-## Tip 42: Keep learning!
+## Tip 43: Keep learning!
 
 There are several effective ways to keep learning about Claude Code:
 
