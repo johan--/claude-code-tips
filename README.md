@@ -647,11 +647,15 @@ You can use plan mode for this by pressing Shift+Tab to switch to it. Or you can
 
 ## Tip 39: Get notified when Claude Code is done
 
-When working on longer tasks, you might want to switch to another window while Claude Code works. But then you have to keep checking back to see if it's finished. Hooks can solve this by sending you a notification when Claude Code stops.
+When working on longer tasks, you might want to switch to another window while Claude Code works. But then you have to keep checking back to see if it's finished.
 
-I wrote a script ([notify-complete.sh](scripts/notify-complete.sh)) that sends a macOS notification with the project name and your last message. You can also click the notification to jump directly to that Terminal window and tab. Note that this script is designed for Terminal.app on macOS.
+I wrote a script ([notify-complete.sh](scripts/notify-complete.sh)) that sends a macOS notification with the project name and a message. You can also click the notification to jump directly to that Terminal window and tab. Note that this script is designed for Terminal.app on macOS.
 
-Here's how you can set it up. First, install terminal-notifier:
+You can use this script in two ways: as a **skill** (on-demand) or as a **hook** (automatic).
+
+### Setup
+
+First, install terminal-notifier:
 
 ```bash
 brew install terminal-notifier
@@ -667,7 +671,25 @@ cp scripts/notify-complete.sh ~/.claude/scripts/
 ln -s /path/to/repo/scripts/notify-complete.sh ~/.claude/scripts/
 ```
 
-Finally, add a Stop hook to your `~/.claude/settings.json`:
+### Option 1: As a skill (recommended)
+
+The skill approach lets you ask Claude to notify you on-demand. Just tell Claude something like "notify me when done" or "let me know when finished" and it will send a notification when the task is complete.
+
+To set this up, copy or symlink the skill file (see [skills/notify/SKILL.md](skills/notify/SKILL.md)):
+
+```bash
+mkdir -p ~/.claude/skills/notify
+# Either copy:
+cp skills/notify/SKILL.md ~/.claude/skills/notify/
+# Or symlink:
+ln -s /path/to/repo/skills/notify/SKILL.md ~/.claude/skills/notify/SKILL.md
+```
+
+### Option 2: As a hook
+
+The hook approach sends a notification every time Claude Code stops. This can be useful but also annoying if you prefer notifications only for longer tasks.
+
+Add a Stop hook to your `~/.claude/settings.json`:
 
 ```json
 {
