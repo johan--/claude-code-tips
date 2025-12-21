@@ -1,3 +1,0 @@
-function n75(A){if(!A)return"";let Q=zIA(A);if(Q.length===0)return"";let B=NZ();return`
-You can use the following tools without requiring user approval: ${Q.map((Z)=>{let Y=u8(Z.ruleValue);if(B){let J=SG0(Y);if(J)return J}return Y}).join(", ")}
-`}

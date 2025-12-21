@@ -1,3 +1,0 @@
-function OX5(A){if(!A)return"";let Q=GXA(A);if(Q.length===0)return"";let B=hZ();return`
-You can use the following tools without requiring user approval: ${Q.map((Z)=>{let Y=X5(Z.ruleValue);if(B){let J=$Y0(Y);if(J)return J}return Y}).join(", ")}
-`}
