@@ -1,6 +1,8 @@
 # Upgrading to a New Claude Code Version
 
-This project patches the Claude Code CLI to reduce system prompt token usage. When Claude Code updates, minified variable names change, breaking existing patches. This guide walks through updating patches for a new version.
+This project patches the Claude Code CLI to reduce system prompt token usage. When Claude Code updates, the text content may change, requiring patch updates. This guide walks through updating patches for a new version.
+
+**Good news:** `patch-cli.js` uses regex matching for `${...}` variable patterns, so patches automatically adapt to minified variable name changes (e.g., `${n3}` → `${XYZ}`). You only need to update patches when the actual text content changes.
 
 **Key files:**
 - `patch-cli.js` - applies patches to reduce prompt size
@@ -91,9 +93,9 @@ docker exec peaceful_lovelace tmux capture-pane -t upgrade -p -S -50
 ```
 
 Claude will:
-1. Find new variable mappings by searching cli.js.backup
-2. Update all .find.txt and .replace.txt files with sed
-3. Test with `node patch-cli.js cli.js` (uses local backup)
+1. Test patches with `node patch-cli.js cli.js` (uses local backup)
+2. For failing patches, find where text content diverged
+3. Update .find.txt and .replace.txt files (variable names adapt automatically via regex)
 4. Iterate until all patches apply
 
 ### Step 5: Test the real installation
@@ -159,26 +161,18 @@ done
 
 # Troubleshooting
 
-## Variable mappings reference
+## How regex matching works
 
-When patches fail, it's usually because minified variable names changed. Common categories:
-- **Tool names:** `D9→U9` (Bash), `uY→cY` (Grep), `bX→fX` (Write)
-- **Object properties:** `tI.name→BY.name`, `In.name→Fn.name`
-- **Function names:** `KoA→woA`, `LGA→PGA`
-- **Full function renames:** `vk3→Yy3`, `S85→n75`
-- **Agent types:** `Sq.agentType→kq.agentType`
+`patch-cli.js` auto-detects `${...}` variable patterns and converts them to regex capture groups. This means:
 
-To find new mappings, grep cli.js.backup:
-```bash
-grep -oE '[A-Za-z0-9_]{2,4}="(Task|Bash|Read|Edit|Write|Glob|Grep)"' cli.js.backup | sort -u
-```
+| Patch Type | Example | Matching |
+|------------|---------|----------|
+| **LIT** (no vars) | `"Use this tool when..."` | Simple string match |
+| **VAR** (has `${...}`) | `"Use ${T3} to read..."` | Regex with capture groups |
 
-To bulk update patches:
-```bash
-sed -i 's/\${OLD}/\${NEW}/g' patches/*.find.txt patches/*.replace.txt
-```
+For VAR patches, the regex captures whatever variable name exists in the bundle and reuses it in the replacement. So `${T3}` in your patch file will match `${XYZ}` in the actual bundle if the surrounding text matches.
 
-**Critical:** Update BOTH `*.find.txt` AND `*.replace.txt` files - they contain the same variables!
+**When patches fail**, it's because the text content changed, not the variable names. Use the binary search technique below to find where text diverges.
 
 ## Finding where patch text diverges
 
@@ -276,17 +270,9 @@ This appears as a harmless orphan section header but keeps the API happy.
 
 **Why remove code-references?** The original reminds Claude to cite code with `file_path:line_number` format. Removing it saves ~360 chars. Claude can still do this naturally without the instruction - the patch just removes the explicit reminder.
 
-## Variable case sensitivity
+## Function-based patches (manual update needed)
 
-**Symptoms:** `[object Object]` in prompt, `subagent_type=undefined`
-
-**Causes:** Case sensitivity (`${R8}` vs `${r8}`) or wrong variable (`${yb1}` should be `${db1}`)
-
-**Fix:** Compare `*.replace.txt` variables against `*.find.txt` or `extract-system-prompt.js` VAR_MAP.
-
-## Function-based patches
-
-Some patches replace entire functions (like `allowed-tools`). The function name itself can change completely between versions (e.g., `OS3` -> `vk3`).
+Some patches replace entire functions (like `allowed-tools`). These are **not** covered by regex matching because the function name itself can change completely (e.g., `OS3` -> `vk3`).
 
 **Step 1: Find the function by its unique string content:**
 ```bash
@@ -324,26 +310,16 @@ claude -p "Use Read to read test.txt" --allowedTools "Read"  # tool check
 
 ## Using container Claude to investigate patches
 
-Claude Code itself can help find variable mappings and compare patches:
+Claude Code can help find where text content changed:
 
 ```bash
 # Ask Claude to find exact text differences
 docker exec container claude --dangerously-skip-permissions -p \
   'Read patches/bash-tool.find.txt and search for this exact text in
    /path/to/cli.js.backup. Tell me where it differs.'
-
-# Ask Claude to find variable mappings
-docker exec container claude --dangerously-skip-permissions -p \
-  'Search cli.js.backup for all occurrences of X="ToolName" patterns.
-   Create a table of variable->tool mappings.'
-
-# Ask Claude to update patches automatically
-docker exec container claude --dangerously-skip-permissions -p \
-  'Update all .find.txt files in patches/ using sed with these mappings:
-   D9->U9, uY->cY, bX->fX. Run the sed command.'
 ```
 
-This is especially useful when multiple variables change between versions - Claude can analyze the cli.js and find all the mappings at once.
+Note: Variable mapping (`${X}→${Y}`) is now automatic via regex matching. You only need Claude's help when the actual text content changed.
 
 ---
 

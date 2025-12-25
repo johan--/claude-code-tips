@@ -87,6 +87,54 @@ function loadPatch(name) {
   return null;
 }
 
+// Convert find/replace patterns to regex-based matching for variable references
+// This allows patches to work across versions where variable names change
+function createRegexPatch(find, replace) {
+  // Pattern to match ${varName}, ${varName()}, ${obj.prop} style references
+  const varRegex = /\$\{[a-zA-Z0-9_.]+(?:\(\))?\}/g;
+
+  // Extract unique variable references from find pattern (in order)
+  const findVars = [];
+  let match;
+  const seenVars = new Set();
+  while ((match = varRegex.exec(find)) !== null) {
+    if (!seenVars.has(match[0])) {
+      seenVars.add(match[0]);
+      findVars.push(match[0]);
+    }
+  }
+
+  // If no variables, return null (use simple string match)
+  if (findVars.length === 0) {
+    return null;
+  }
+
+  // Build regex pattern: escape everything except variable refs, which become capture groups
+  let regexStr = find;
+  // First escape all regex special chars
+  regexStr = regexStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // Then replace each unique variable with a capture group
+  // The capture group matches any ${...} pattern (including dots and parens)
+  const varCapture = '(\\$\\{[a-zA-Z0-9_.]+(?:\\(\\))?\\})';
+  for (const v of findVars) {
+    const escaped = v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    regexStr = regexStr.split(escaped).join(varCapture);
+  }
+
+  // Build replacement string with backreferences
+  let replaceStr = replace;
+  for (let i = 0; i < findVars.length; i++) {
+    // Replace the variable placeholder with $N backreference
+    replaceStr = replaceStr.split(findVars[i]).join(`$${i + 1}`);
+  }
+
+  return {
+    regex: new RegExp(regexStr),
+    replace: replaceStr,
+    varCount: findVars.length
+  };
+}
+
 // Patches to apply (find → replace)
 // Only patches saving 100+ chars are included
 const patches = [
@@ -223,7 +271,20 @@ function main() {
       replace = patch.replace;
     }
 
-    if (content.includes(find)) {
+    // Try regex-based matching for patterns with variable references
+    const regexPatch = createRegexPatch(find, replace);
+
+    if (regexPatch) {
+      // Use regex matching
+      if (regexPatch.regex.test(content)) {
+        content = content.replace(regexPatch.regex, regexPatch.replace);
+        console.log(`[OK] ${patch.name} (regex, ${regexPatch.varCount} vars)`);
+        appliedCount++;
+      } else {
+        console.log(`[SKIP] ${patch.name} (regex not found)`);
+      }
+    } else if (content.includes(find)) {
+      // Simple string match (no variables)
       if (patch.replaceAll) {
         content = content.split(find).join(replace);
       } else {
@@ -232,7 +293,7 @@ function main() {
       console.log(`[OK] ${patch.name}`);
       appliedCount++;
     } else {
-      console.log(`[SKIP] ${patch.name} (not found in bundle)`);
+      console.log(`[SKIP] ${patch.name} (not found)`);
     }
   }
 
