@@ -44,7 +44,7 @@ Here are my tips for getting the most out of Claude Code, including a custom sta
 - [Tip 32: Audit your approved commands](#tip-32-audit-your-approved-commands)
 - [Tip 33: Write lots of tests (and use TDD)](#tip-33-write-lots-of-tests-and-use-tdd)
 - [Tip 34: Be braver in the unknown; iterative problem solving](#tip-34-be-braver-in-the-unknown-iterative-problem-solving)
-- [Tip 35: Ctrl+B to move commands to the background](#tip-35-ctrlb-to-move-commands-to-the-background)
+- [Tip 35: Running bash commands and agents in the background](#tip-35-running-bash-commands-and-agents-in-the-background)
 - [Tip 36: The era of personalized software is here](#tip-36-the-era-of-personalized-software-is-here)
 - [Tip 37: Navigating and editing your input box](#tip-37-navigating-and-editing-your-input-box)
 - [Tip 38: Spend some time planning, but also prototype quickly](#tip-38-spend-some-time-planning-but-also-prototype-quickly)
@@ -594,11 +594,13 @@ What followed was a collaborative and iterative process. Claude Code suggested p
 
 Eventually I found a pretty elegant solution. The lesson: even in the world of the unknown, you can do a lot more with Claude Code than you might think.
 
-## Tip 35: Ctrl+B to move commands to the background
+## Tip 35: Running bash commands and agents in the background
 
 When you have a long-running bash command in Claude Code, you can press Ctrl+B to move it to run in the background. Claude Code knows how to manage background processes - it can check on them later using the BashOutput tool.
 
 This is useful when you realize a command is taking longer than expected and you want Claude to do something else in the meantime. You can either have it use the exponential backoff method I mentioned in Tip 16 to check on progress, or just let it work on something else entirely while the process runs.
+
+Claude Code also has the ability to run subagents in the background. If you need to do long-running research or have an agent check on something periodically, you don't have to keep it running in the foreground. Just ask Claude Code to run an agent or task in the background, and it'll handle it while you continue with other work.
 
 ## Tip 36: The era of personalized software is here
 
