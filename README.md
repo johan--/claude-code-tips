@@ -304,9 +304,20 @@ The main difference between these two seems to be that Playwright focuses on the
 
 This might improve over time, but by default I would go with Playwright for most tasks that aren't visually intensive. I'd only use Claude's native browser integration if I need to use a logged-in state without having to provide credentials (since it runs in your own browser profile), or if it specifically needs to click on things visually using their coordinates.
 
-One tip for improving Claude's native browser integration: you can ask it to click elements using their reference IDs instead of coordinates.
-
 This is why I disable Claude's native browser integration by default and use it through the `ch` shortcut I defined previously. That way Playwright handles most browser tasks, and I only enable Claude's native integration when I specifically need it.
+
+Additionally, you can ask it to use DOM-based interaction instead of coordinates. Here's what I put in my CLAUDE.md for this:
+
+```markdown
+# Claude for Chrome
+
+**ALWAYS use DOM-based interaction. NEVER use coordinates.**
+
+- Use `read_page` to get element refs
+- Use `find` to locate elements by description
+- Click/interact using `ref` parameter - NEVER coordinates
+- NEVER take screenshots unless explicitly requested by the user
+```
 
 In my personal experience, I've also had a situation where I was working on a Python library at [Daft](https://github.com/Eventual-Inc/Daft) and needed to test a version I built locally on Google Colab. The trouble is it's hard to build a Python library with a Rust backend on Google Colab - it doesn't seem to work that well. So I needed to actually build a wheel locally and then upload it manually so that I could run it on Google Colab. I also tried monkey patching, which worked well in the short term before I had to wait for the whole wheel to build locally.
 
