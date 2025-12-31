@@ -331,16 +331,14 @@ This might improve over time, but by default I would go with Playwright for most
 
 This is why I disable Claude's native browser integration by default and use it through the `ch` shortcut I defined previously. That way Playwright handles most browser tasks, and I only enable Claude's native integration when I specifically need it.
 
-Additionally, you can ask it to use DOM-based interaction instead of coordinates. Here's what I put in my CLAUDE.md for this:
+Additionally, you can ask it to use accessibility tree refs instead of coordinates. Here's what I put in my CLAUDE.md for this:
 
 ```markdown
 # Claude for Chrome
 
-**ALWAYS use DOM-based interaction. NEVER use coordinates.**
-
-- Use `read_page` to get element refs
+- Use `read_page` to get element refs from the accessibility tree
 - Use `find` to locate elements by description
-- Click/interact using `ref` parameter - NEVER coordinates
+- Click/interact using `ref`, not coordinates
 - NEVER take screenshots unless explicitly requested by the user
 ```
 

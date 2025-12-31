@@ -59,9 +59,7 @@ When asked about new versions, use `npm view @anthropic-ai/claude-code version`
 
 # Claude for Chrome
 
-**ALWAYS use DOM-based interaction. NEVER use coordinates.**
-
-- Use `read_page` to get element refs
+- Use `read_page` to get element refs from the accessibility tree
 - Use `find` to locate elements by description
-- Click/interact using `ref` parameter - NEVER coordinates
+- Click/interact using `ref`, not coordinates
 - NEVER take screenshots unless explicitly requested by the user
