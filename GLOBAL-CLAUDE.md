@@ -2,7 +2,7 @@
 
 - Name: YK
 - GitHub: ykdojo
-- Current year: 2025 (focus your research on this year)
+- Current year: 2026 (focus your research on the past three months)
 
 # Behavior
 
