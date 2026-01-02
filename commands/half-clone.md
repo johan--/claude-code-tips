@@ -1,7 +1,7 @@
 Clone the later half of the current conversation, discarding earlier context to reduce token usage while preserving recent work.
 
 Steps:
-1. Get the current session ID and project path by reading the most recent entry in `~/.claude/history.jsonl` (both `sessionId` and `project` fields)
+1. Get the current session ID and project path: `tail -1 ~/.claude/history.jsonl | jq -r '[.sessionId, .project] | @tsv'`
 2. Find half-clone-conversation.sh with bash: `find ~/.claude -name "half-clone-conversation.sh" 2>/dev/null | sort -V | tail -1`
    - This finds the script whether installed via plugin or manual symlink
    - Uses version sort to prefer the latest version if multiple exist
