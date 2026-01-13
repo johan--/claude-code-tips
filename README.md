@@ -452,7 +452,33 @@ Check out the [system-prompt folder](system-prompt/) for the patch scripts and f
 
 **Requirements**: These patches require npm installation (`npm install -g @anthropic-ai/claude-code`). The patching works by modifying the JavaScript bundle (`cli.js`) - other installation methods may produce compiled binaries that can't be patched this way.
 
-**Important**: If you want to keep your patched system prompt, disable auto-updates by adding `export DISABLE_AUTOUPDATER=1` to `~/.zshenv` (not `~/.zshrc`). The reason for `.zshenv` is that it's sourced for ALL zsh invocations, including non-interactive shells and tmux sessions. `.zshrc` only gets sourced for interactive shells, so tmux-based workflows (like the ones in Tips 9, 11, and 21) would auto-update without `.zshenv`. You can manually update later with `npm update -g @anthropic-ai/claude-code` when you're ready to re-apply patches to a new version.
+**Important**: If you want to keep your patched system prompt, disable auto-updates by adding this to `~/.claude/settings.json`:
+
+```json
+{
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  }
+}
+```
+
+This applies to all Claude Code sessions regardless of shell type (interactive, non-interactive, tmux). You can manually update later with `npm update -g @anthropic-ai/claude-code` when you're ready to re-apply patches to a new version.
+
+### Lazy-load MCP tools
+
+If you use MCP servers, their tool definitions are loaded into every conversation by default - even if you don't use them. This can add significant overhead, especially with multiple servers configured.
+
+Enable lazy-loading so MCP tools are only loaded when needed:
+
+```json
+{
+  "env": {
+    "ENABLE_TOOL_SEARCH": "true"
+  }
+}
+```
+
+Add this to `~/.claude/settings.json`. Claude will search for and load MCP tools on-demand rather than having them all present from the start.
 
 ## Tip 16: Git worktrees for parallel branch work
 
