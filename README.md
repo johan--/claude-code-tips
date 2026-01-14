@@ -745,6 +745,15 @@ This is useful when you realize a command is taking longer than expected and you
 
 Claude Code also has the ability to run subagents in the background. If you need to do long-running research or have an agent check on something periodically, you don't have to keep it running in the foreground. Just ask Claude Code to run an agent or task in the background, and it'll handle it while you continue with other work.
 
+### Using sub-agents strategically
+
+Beyond just running things in the background, sub-agents are useful when you have a large task to break down. For example, if you have a huge codebase that you need to analyze, you can have sub-agents analyze it in different ways or look at different parts of the codebase in parallel. Just ask Claude to spawn multiple sub-agents to handle different pieces.
+
+You can customize sub-agents by just asking:
+- **How many** - ask Claude to spawn the number you want
+- **Background vs foreground** - ask to run them in the background, or press Ctrl+B
+- **Which model** - ask for Opus, Sonnet, or Haiku depending on the complexity of each task (sub-agents default to Sonnet)
+
 ## Tip 37: The era of personalized software is here
 
 We're entering an era of personalized, custom software. Since AI came out - ChatGPT in general, but especially Claude Code - I've noticed that I'm able to create a lot more software, sometimes just for myself, sometimes for small projects.
