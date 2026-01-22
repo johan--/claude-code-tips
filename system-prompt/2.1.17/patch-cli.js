@@ -169,6 +169,7 @@ const patches = [
   { name: 'Slim LSP tool description (~750 → 150 chars)', file: 'lsp-tool' },
   { name: 'Slim Edit tool description (~900 → 200 chars)', file: 'edit-tool' },
   { name: 'Slim EnterPlanMode examples (670 → 150 chars)', file: 'enterplanmode-examples' },
+  { name: 'Slim EnterPlanMode What Happens (~400 → 120 chars)', file: 'enterplanmode-whathappens' },
   { name: 'Slim ExitPlanMode description (~1.5KB → 200 chars)', file: 'exitplanmode' },
   { name: 'Slim Professional objectivity (762 → 120 chars)', file: 'professional-objectivity' },
   { name: 'Slim WebFetch usage notes (808 → 120 chars)', file: 'webfetch-usage' },
