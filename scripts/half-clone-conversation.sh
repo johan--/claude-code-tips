@@ -314,7 +314,37 @@ half_clone_conversation() {
     init_uuid_map
     trap cleanup_uuid_map EXIT
 
-    # Process the file - skip first half
+    # First pass: find if last clean user message is a clone/half-clone command
+    local stop_at_line=0
+    local scan_line=0
+    local last_clone_cmd_line=0
+    local last_clean_user_line=0
+
+    while IFS= read -r line || [ -n "$line" ]; do
+        [ -z "$line" ] && continue
+        ((scan_line++)) || true
+
+        # Check for clean user message (type:user but not tool_result or isMeta)
+        if echo "$line" | grep -q '"type":"user"' 2>/dev/null; then
+            if ! echo "$line" | grep -q '"type":"tool_result"' 2>/dev/null; then
+                if ! echo "$line" | grep -q '"isMeta":true' 2>/dev/null; then
+                    last_clean_user_line=$scan_line
+                    # Check if this is a clone command (matches both dx:clone and clone, dx:half-clone and half-clone)
+                    if echo "$line" | grep -qE '<command-message>(dx:)?clone</command-message>|<command-message>(dx:)?half-clone</command-message>' 2>/dev/null; then
+                        last_clone_cmd_line=$scan_line
+                    fi
+                fi
+            fi
+        fi
+    done < "$source_file"
+
+    # If the last clean user message is a clone command, stop before it
+    if [ "$last_clone_cmd_line" -gt 0 ] && [ "$last_clone_cmd_line" -eq "$last_clean_user_line" ]; then
+        stop_at_line=$last_clone_cmd_line
+        log_info "Will exclude /clone command and subsequent messages (line $stop_at_line onwards)"
+    fi
+
+    # Second pass: process the file - skip first half
     local current_line=0
     local output_line_count=0
     local first_message_processed="false"
@@ -327,6 +357,11 @@ half_clone_conversation() {
         # Skip first half
         if [ "$current_line" -le "$skip_count" ]; then
             continue
+        fi
+
+        # Stop if we've reached the clone command line
+        if [ "$stop_at_line" -gt 0 ] && [ "$current_line" -ge "$stop_at_line" ]; then
+            break
         fi
 
         local is_first_message="false"

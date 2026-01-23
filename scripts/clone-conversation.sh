@@ -249,12 +249,49 @@ clone_conversation() {
     init_uuid_map
     trap cleanup_uuid_map EXIT
 
-    # Process the file
-    local first_user_found="false"
-    local line_count=0
+    # First pass: find if last clean user message is a clone/half-clone command
+    local stop_at_line=0
+    local current_line=0
+    local last_clone_cmd_line=0
+    local last_clean_user_line=0
 
     while IFS= read -r line || [ -n "$line" ]; do
         [ -z "$line" ] && continue
+        ((current_line++)) || true
+
+        # Check for clean user message (type:user but not tool_result or isMeta)
+        if echo "$line" | grep -q '"type":"user"' 2>/dev/null; then
+            if ! echo "$line" | grep -q '"type":"tool_result"' 2>/dev/null; then
+                if ! echo "$line" | grep -q '"isMeta":true' 2>/dev/null; then
+                    last_clean_user_line=$current_line
+                    # Check if this is a clone command (matches both dx:clone and clone, dx:half-clone and half-clone)
+                    if echo "$line" | grep -qE '<command-message>(dx:)?clone</command-message>|<command-message>(dx:)?half-clone</command-message>' 2>/dev/null; then
+                        last_clone_cmd_line=$current_line
+                    fi
+                fi
+            fi
+        fi
+    done < "$source_file"
+
+    # If the last clean user message is a clone command, stop before it
+    if [ "$last_clone_cmd_line" -gt 0 ] && [ "$last_clone_cmd_line" -eq "$last_clean_user_line" ]; then
+        stop_at_line=$last_clone_cmd_line
+        log_info "Will exclude /clone command and subsequent messages (line $stop_at_line onwards)"
+    fi
+
+    # Second pass: process the file
+    local first_user_found="false"
+    local line_count=0
+    current_line=0
+
+    while IFS= read -r line || [ -n "$line" ]; do
+        [ -z "$line" ] && continue
+        ((current_line++)) || true
+
+        # Stop if we've reached the clone command line
+        if [ "$stop_at_line" -gt 0 ] && [ "$current_line" -ge "$stop_at_line" ]; then
+            break
+        fi
 
         local is_first_user="false"
         if [ "$first_user_found" = "false" ] && echo "$line" | grep -q '"type":"user"' 2>/dev/null; then
